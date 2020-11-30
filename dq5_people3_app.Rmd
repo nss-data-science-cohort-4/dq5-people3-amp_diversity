@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+library(tidyverse)
+library(censusapi)
+
+```{r}
+#created a text file with the api key, read in
+key=read_lines('data/key.txt')
+```
+```{r}
+#create dataset for us census apis
+apis <- listCensusApis()
+view(apis)
+```
+```{r}
+#look into metadata for acs1/2019
+metadata <- listCensusMetadata(
+  name = "acs/acs1/profile",
+  vintage = 2019)
+```
+
+
+```{r}
+view(metadata)
+```
+```{r}
+acs1 <- getCensus(
+  key = key,
+  name = "acs/acs1/profile", 
+  vintage = 2019,
+  vars = c("DP05_0070PE", "DP05_0076PE", "DP05_0033PE", "DP02PR_0062PE", "DP05_0002PE", "DP05_0003PE", "DP05_0018PE", "DP05_0025PE", "DP02_0069PE", "DP02_0076PE"),
+  region = 'county:037',
+  regionin = 'state:47')
+
+
+```
+```{r}
+view(acs1)
+```
+```{r}
+acs1 %>% 
+  rename(hispanic_total_pop = DP05_0070PE)
+```
+
+
