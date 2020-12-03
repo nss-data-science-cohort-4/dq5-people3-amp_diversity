@@ -3,19 +3,6 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
 library(tidyverse)
 library(censusapi)
@@ -45,9 +32,13 @@ acs1 <- getCensus(
   key = key,
   name = "acs/acs1/profile", 
   vintage = 2019,
-  vars = c("DP05_0070PE", "DP05_0076PE", "DP05_0033PE", "DP02PR_0062PE", "DP05_0002PE", "DP05_0003PE", "DP05_0018PE", "DP05_0025PE", "DP02_0069PE", "DP02_0076PE"),
-  region = 'county:037',
-  regionin = 'state:47')
+  #pull in variables for race, gender, age, disability, veteran, sexual orientation(if possible)
+  #I will attempt use variables with "percentage" instead of "estimate"
+  vars = c("DP05_0076PE", "DP05_0033PE", "DP05_0025PE", "DP02_0076PE", "DP05_0039PE", "DP05_0038PE", "DP05_0044PE", "DP05_0052PE","DP05_0037PE", "DP05_0035PE", "DP05_0027PE", "DP05_0026PE", "DP02_0070PE", "DP05_0071PE"),
+  #Davidson County
+  region = 'county:037', 
+  #State of TN
+  regionin = 'state:47') #State of TN
 
 
 ```
@@ -56,7 +47,10 @@ view(acs1)
 ```
 ```{r}
 acs1 %>% 
-  rename(hispanic_total_pop = DP05_0070PE)
+  rename(total_pop_not_hispanic = DP05_0076PE, total_pop = DP05_0033PE, TN = state, Davidson = county, nat_american_alaskan = DP05_0039PE, asian = DP05_0044PE, black_afr_american = DP05_0038PE, hawaiian_pacific = DP05_0052PE, white = DP05_0037PE, hispanic_or_latino = DP05_0071PE, two_or_more_races = DP05_0035PE, males_18yrs_and_over = DP05_0026PE, females_18yrs_and_over = DP05_0027PE, civilian_vets = DP02_0070PE, disabled_18_to_64 = DP02_0076PE)
 ```
 
+```{r}
+view(acs1)
+```
 
