@@ -6,22 +6,21 @@ navbarPage(
     "Upload data",
     fluidPage(
       theme = shinytheme("slate"),
-      wellPanel(p("Please upload a .csv file."),
-                p("Your file will be checked for errors")),
+      wellPanel(p("Upload your file and click continue. Your file will be checked for errors")),
       fluidRow(
-        column(fileInput("uploaded_data_file)",
-                         label ="Upload your data"),
-               width = 6),
-        selectInput("Race",
-                    "Race:",
-                    choices = sort(tn_race$variable)
-        ),
+        # column(
+        #   downloadButton("download_time_tracker_template",
+        #                  "Download template"),
+        #   width = 2
+        # ),
+        column(fileInput("uploaded_time_tracker",
+                         label = "Upload your data"),
+               width = 6)
       ),
       actionButton("anaylse_data",
                    "Analyse Data",
                    width = "100%"),
-
-      plotOutput("data_summary")
+      plotOutput("time_tracker_summary")
     )
   ),
   collapsible = TRUE
