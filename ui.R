@@ -11,11 +11,16 @@ navbarPage(
       fluidRow(
         column(fileInput("uploaded_data_file)",
                          label ="Upload your data"),
-               width = 6)
+               width = 6),
+        selectInput("Race",
+                    "Race:",
+                    choices = sort(tn_race$variable)
+        ),
       ),
       actionButton("anaylse_data",
                    "Analyse Data",
                    width = "100%"),
+
       plotOutput("data_summary")
     )
   ),

@@ -24,18 +24,19 @@ function(input, output, session) {
     
     input$anaylse_data
     
+    ggplot()
     uploaded_data_file <- isolate(uploaded_data_file())
-    
-    uploaded_data_file %>%
-      group_by(`project name`) %>%
-      summarise(total_hours = sum(`hours worked`)) %>%
-      ggplot(aes(x = fct_reorder(`project name`, total_hours),
-                 y = total_hours)) +
-      geom_col() +
-      labs(x = "",
-           y = "Total Hours Worked") +
-      theme_minimal() +
-      coord_flip()
+    # # this the code that will analyze data
+    # uploaded_data_file %>%
+    #   group_by(`project name`) %>%
+    #   summarise(total_hours = sum(`hours worked`)) %>%
+    #   ggplot(aes(x = fct_reorder(`project name`, total_hours),
+    #              y = total_hours)) +
+    #   geom_col() +
+    #   labs(x = "",
+    #        y = "Total Hours Worked") +
+    #   theme_minimal() +
+    #   coord_flip()
     
   })
   
