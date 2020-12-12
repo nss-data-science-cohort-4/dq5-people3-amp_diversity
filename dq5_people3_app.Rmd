@@ -6,6 +6,7 @@ output: html_notebook
 
 library(tidyverse)
 library(censusapi)
+library(dplyr)
 
 ```{r}
 #created a text file with the api key, read in
@@ -14,7 +15,7 @@ key=read_lines('data/key.txt')
 ```{r}
 #create dataset for us census apis
 apis <- listCensusApis()
-view(apis)
+#view(apis)
 ```
 ```{r}
 #look into metadata for acs1/2019
@@ -25,32 +26,187 @@ metadata <- listCensusMetadata(
 
 
 ```{r}
-view(metadata)
+#view(metadata)
 ```
 ```{r}
+#listCensusMetadata(type = "variables")
+```
+
+Pull in age demographics for 18 and above, then combine into decade buckets, and create a % for each bucket
+```{r}
+
+# create an age variable to plug into code, note we can only find estimates and not percentages for age & sex
+
+age_vars <- c(
+#Male_15_to_17_years = "B01001_006E",
+#Female_15_to_17_years = "B01001_030E",
+Male_18_and_19_years = "B01001_007E",
+Male_20_years = "B01001_008E",
+Female_18_and_19_years = "B01001_031E",
+Female_20_years = "B01001_032E",
+Male_21_years = "B01001_009E",
+Male_22_to_24_years = "B01001_010E",
+Male_25_to_29_years = "B01001_011E",
+Female_21_years = "B01001_033E",
+Female_22_to_24_years = "B01001_034E",
+Female_25_to_29_years = "B01001_035E",
+Male_30_to_34_years = "B01001_012E",
+Male_35_to_39_years = "B01001_013E",
+Female_30_to_34_years = "B01001_036E",
+Female_35_to_39_years = "B01001_037E",
+Male_40_to_44_years = "B01001_014E",
+Male_45_to_49_years = "B01001_015E",
+Female_40_to_44_years = "B01001_038E",
+Female_45_to_49_years = "B01001_039E",
+Male_50_to_54_years = "B01001_016E",
+Male_55_to_59_years = "B01001_017E",
+Female_50_to_54_years = "B01001_040E",
+Female_55_to_59_years = "B01001_041E",
+Male_60_and_61_years = "B01001_018E",
+Male_62_to_64_years = "B01001_019E",
+Male_65_and_66_years = "B01001_020E",
+Female_60_and_61_years = "B01001_042E",
+Female_62_to_64_years = "B01001_043E",
+Female_65_and_66_years = "B01001_044E",
+Male_67_to_69_years = "B01001_021E",
+Male_70_to_74_years = "B01001_022E",
+Male_75_to_79_years = "B01001_023E",
+Male_80_to_84_years = "B01001_024E",
+Male_85_years_and_over = "B01001_025E",
+Female_67_to_69_years = "B01001_045E",
+Female_70_to_74_years = "B01001_046E",
+Female_75_to_79_years = "B01001_047E",
+Female_80_to_84_years = "B01001_048E",
+Female_85_years_and_over = "B01001_049E")
+
+
+```
+plus age variable into code below to pull in data for Davidson County
+```{r}
+state_age <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        variables = c(age_vars),
+        year = .x,
+        survey = 'acs1'
+    ),
+    .id = 'year'
+    )  %>% 
+    clean_names()
+state_age <- state_age %>% filter(geoid=='47037')
+
+#view(metadata)
+```
+
+Aggregate the age groups into decade buckets (e.g., 20-29, 30-39) 
+```{r}
+```
+```{r}
+state_age1 <- state_age %>% mutate(label = case_when(
+  variable %in% c("B01001_007")~ "Male - 18 to 19 years",
+  variable %in% c("B01001_008", "B01001_009", "B01001_010", "B01001_011")~ "Male - 20 to 29 years",
+  variable %in% c("B01001_012", "B01001_013")~ "Male - 30 to 39 years",
+  variable %in% c("B01001_014", "B01001_015")~ "Male - 40 to 49 years",
+  variable %in% c("B01001_016", "B01001_017")~ "Male - 50 to 59 years",
+  variable %in% c("B01001_018", "B01001_019", "B01001_020")~ "Male - 60 to 66 years",
+  variable %in% c("B01001_021", "B01001_022", "B01001_023", "B01001_024", "B01001_025")~ "Male - 67 and over", 
+  variable %in% c("B01001_031")~ "Female - 18 to 19 years",
+  variable %in% c("B01001_032", "B01001_033", "B01001_034", "B01001_035")~ "Female - 20 to 29 years",
+variable %in% c("B01001_036", "B01001_037") ~ "Female - 30 to 39 years",
+variable %in% c("B01001_038", "B01001_039") ~ "Female - 40 to 49 years",
+variable %in% c("B01001_040", "B01001_041") ~ "Female - 50 to 59 years",
+variable %in% c("B01001_042", "B01001_043", "B01001_044") ~ "Female - 60 to 66 years",
+variable %in% c("B01001_045", "B01001_046", "B01001_047", "B01001_048", "B01001_049") ~ "Female - 67 and over"))
+
+
+```
+convert each bucket to percentage 
+```{r}
+state_age2 <- state_age1%>% 
+  group_by(label) %>% 
+  summarise(estimate = sum(estimate)) %>% 
+  mutate(percent_age = estimate/sum(estimate) * 100)
+
+#view(state_age2)
+
+
+```
+
+
+```{r}
+age_bracket <- state_age2[,-c(2)]
+age_bracket <- age_bracket %>% 
+  rename(Variables = label, Percentage = percent_age)
+view(age_bracket)
+ 
+```
+
+```{r}
+#pull in variables for race, gender, age, education by percentage. Exclude #disability, veteran, sexual orientation (diff data source for sex orient)
+
 acs1 <- getCensus(
   key = key,
   name = "acs/acs1/profile", 
   vintage = 2019,
-  #pull in variables for race, gender, age, disability, veteran, sexual orientation(if possible)
-  #I will attempt use variables with "percentage" instead of "estimate"
-  vars = c("DP05_0076PE", "DP05_0033PE", "DP05_0025PE", "DP02_0076PE", "DP05_0039PE", "DP05_0038PE", "DP05_0044PE", "DP05_0052PE","DP05_0037PE", "DP05_0035PE", "DP05_0027PE", "DP05_0026PE", "DP02_0070PE", "DP05_0071PE"),
+
+  vars = c("DP05_0033PE", "DP05_0039PE", "DP05_0038PE", "DP05_0044PE", "DP05_0052PE","DP05_0037PE", "DP05_0035PE", "DP05_0027PE", "DP05_0026PE", "DP05_0071PE", "DP02_0060PE", "DP02_0067PE", "DP02_0063PE", "DP02_0064PE", "DP02_0065PE", "DP02_0066PE", "DP05_0057PE"),
   #Davidson County
   region = 'county:037', 
   #State of TN
-  regionin = 'state:47') #State of TN
+  regionin = 'state:47') 
 
+```
+Rename columns
+```{r}
+acs1 <- acs1 %>% 
+  rename("Total Pop" = DP05_0033PE, TN = state, Davidson = county, "American Indian and Alaska Native" = DP05_0039PE, Asian = DP05_0044PE, "Black or African American" = DP05_0038PE, "Native Hawaiian and Other Pacific Islander" = DP05_0052PE, "White Alone" = DP05_0037PE, "Hispanic or Latino" = DP05_0071PE, "Two or more races" = DP05_0035PE, "Male - 18 and over" = DP05_0026PE, "Female - 18 and over" = DP05_0027PE, "Less than 9th Grade" = DP02_0060PE, "High school graduate (includes equivalency)" = DP02_0067PE, "Some college, no degree" = DP02_0063PE, "Associate's degree" = DP02_0064PE, "Bachelor's degree" = DP02_0065PE, "Graduate/Professional Degree" = DP02_0066PE, "Other Race" = DP05_0057PE)
+```
+(Placeholder for civilian_vets = DP02_0070PE, disabled_18_to_64 = DP02_0076PE, total_pop_not_hispanic_lat = DP05_0076PE in case needed later)
+
+```{r}
+#convert to test csv file
+#write.csv(acs1,"data/test_file.csv", row.names = TRUE)
+```
+change acs1 file from horizontal to vertical layout
+
+```{r}
+acs1_long <- gather(acs1, Variables, Percentage)
 
 ```
 ```{r}
-view(acs1)
+acs1_vars <- acs1_long[-c(1,2,3),]
 ```
 ```{r}
-acs1 %>% 
-  rename(total_pop_not_hispanic = DP05_0076PE, total_pop = DP05_0033PE, TN = state, Davidson = county, nat_american_alaskan = DP05_0039PE, asian = DP05_0044PE, black_afr_american = DP05_0038PE, hawaiian_pacific = DP05_0052PE, white = DP05_0037PE, hispanic_or_latino = DP05_0071PE, two_or_more_races = DP05_0035PE, males_18yrs_and_over = DP05_0026PE, females_18yrs_and_over = DP05_0027PE, civilian_vets = DP02_0070PE, disabled_18_to_64 = DP02_0076PE)
+view(acs1_vars)
+```
+Append acs1_vars with age_bracket and call it data_comb
+First, determine column types for conformity
+```{r}
+list(acs1_vars, age_bracket)
+```
+```{r}
+#convert the Percentage column on both datasets to numeric
+acs1_num <- acs1_vars %>% 
+  mutate_at(c(2), as.numeric)
+
 ```
 
 ```{r}
-view(acs1)
+# for age_bracket, shorten the Percentage column to 1 decimal point
+#age_bracket <- age_bracket %>% 
+#~ round(., 0)
+  
+  
+```
+
+
+```{r}
+data_comb <- bind_rows(acs1_num, age_bracket)
+data_comb
+```
+```{r}
+#convert to test csv file
+write.csv(data_comb,"data/test_file2.csv", row.names = TRUE)
 ```
 
