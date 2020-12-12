@@ -1,0 +1,304 @@
+---
+title: "dq5 People3"
+author: "Alvin Wendt"
+date: "11/24/2020"
+output: html_document
+---
+Libraries to import
+```{r}
+library(tidycensus)
+library(censusapi)
+library(janitor)
+#library(tigris)
+#options(tigris_use_cache = TRUE)
+library(tidyverse)
+library(purrr)
+```
+Apply API Key to Variable
+```{r}
+api_key <- "input API Key here"
+```
+
+Install Census API key
+```{r}
+census_api_key(api_key,install = TRUE)
+```
+Load ACS Variable list
+```{r}
+acs_variable_list <- load_variables(2019,"acs1", cache = TRUE)
+```
+
+ACS Variable List write to CSV for easy viewing and filtering
+```{r}
+write.csv(acs_variable_list,'acs_variable_list_2019',row.names = FALSE)
+```
+
+Code to run Metadata information in determining variable
+```{r}
+key=read_lines(api_key)
+
+apis <- listCensusApis()
+view(apis)
+
+metadata <- listCensusMetadata(
+    name = 'acs/acs1/profile',
+    vintage = 2019)
+
+```
+
+Create ACS Race Variables
+```{r}
+race_variables_pecentage <- c(totpop = 'DP05_0033PE',
+                     nothispanic = 'DP05_0076PE',
+                     nh_whitealone = 'DP05_0037PE',
+                     nh_black = 'DP05_0038PE',
+                     nh_indian = 'DP05_0039PE',
+                     nh_asian = 'DP05_0044PE',
+                     nh_pacisl = 'DP05_0052PE',
+                     nh_multi = 'DP05_0035PE',
+                     hispanic = 'DP05_0071PE')
+```
+
+Create Education
+```{r}
+education_variables <- c(Pop25andover = 'DP02_0059E',
+                         lessthan9th = 'DP02_0060PE',
+                         highschool = 'DP02_0067PE',
+                         somecollege = 'DP02_0063PE',
+                         associates = 'DP02_0064PE',
+                         bachelors = 'DP02_0065PE',
+                         graduate = 'DP02_0066PE')
+```
+
+Create Age Variables
+```{r}
+age_variables <- c(SEX_BY_AGE_Total = "B01001_001E",
+SEX_BY_AGE_Male_ = "B01001_002E",
+SEX_BY_AGE_Male_Under_5_years = "B01001_003E",
+SEX_BY_AGE_Male_5_to_9_years = "B01001_004E",
+SEX_BY_AGE_Male_10_to_14_years = "B01001_005E",
+SEX_BY_AGE_Male_15_to_17_years = "B01001_006E",
+SEX_BY_AGE_Male_18_and_19_years = "B01001_007E",
+SEX_BY_AGE_Male_20_years = "B01001_008E",
+SEX_BY_AGE_Male_21_years = "B01001_009E",
+SEX_BY_AGE_Male_22_to_24_years = "B01001_010E",
+SEX_BY_AGE_Male_25_to_29_years = "B01001_011E",
+SEX_BY_AGE_Male_30_to_34_years = "B01001_012E",
+SEX_BY_AGE_Male_35_to_39_years = "B01001_013E",
+SEX_BY_AGE_Male_40_to_44_years = "B01001_014E",
+SEX_BY_AGE_Male_45_to_49_years = "B01001_015E",
+SEX_BY_AGE_Male_50_to_54_years = "B01001_016E",
+SEX_BY_AGE_Male_55_to_59_years = "B01001_017E",
+SEX_BY_AGE_Male_60_and_61_years = "B01001_018E",
+SEX_BY_AGE_Male_62_to_64_years = "B01001_019E",
+SEX_BY_AGE_Male_65_and_66_years = "B01001_020E",
+SEX_BY_AGE_Male_67_to_69_years = "B01001_021E",
+SEX_BY_AGE_Male_70_to_74_years = "B01001_022E",
+SEX_BY_AGE_Male_75_to_79_years = "B01001_023E",
+SEX_BY_AGE_Male_80_to_84_years = "B01001_024E",
+SEX_BY_AGE_Male_85_years_and_over = "B01001_025E",
+SEX_BY_AGE_Female_ = "B01001_026E",
+SEX_BY_AGE_Female_Under_5_years = "B01001_027E",
+SEX_BY_AGE_Female_5_to_9_years = "B01001_028E",
+SEX_BY_AGE_Female_10_to_14_years = "B01001_029E",
+SEX_BY_AGE_Female_15_to_17_years = "B01001_030E",
+SEX_BY_AGE_Female_18_and_19_years = "B01001_031E",
+SEX_BY_AGE_Female_20_years = "B01001_032E",
+SEX_BY_AGE_Female_21_years = "B01001_033E",
+SEX_BY_AGE_Female_22_to_24_years = "B01001_034E",
+SEX_BY_AGE_Female_25_to_29_years = "B01001_035E",
+SEX_BY_AGE_Female_30_to_34_years = "B01001_036E",
+SEX_BY_AGE_Female_35_to_39_years = "B01001_037E",
+SEX_BY_AGE_Female_40_to_44_years = "B01001_038E",
+SEX_BY_AGE_Female_45_to_49_years = "B01001_039E",
+SEX_BY_AGE_Female_50_to_54_years = "B01001_040E",
+SEX_BY_AGE_Female_55_to_59_years = "B01001_041E",
+SEX_BY_AGE_Female_60_and_61_years = "B01001_042E",
+SEX_BY_AGE_Female_62_to_64_years = "B01001_043E",
+SEX_BY_AGE_Female_65_and_66_years = "B01001_044E",
+SEX_BY_AGE_Female_67_to_69_years = "B01001_045E",
+SEX_BY_AGE_Female_70_to_74_years = "B01001_046E",
+SEX_BY_AGE_Female_75_to_79_years = "B01001_047E",
+SEX_BY_AGE_Female_80_to_84_years = "B01001_048E",
+SEX_BY_AGE_Female_85_years_and_over = "B01001_049E"
+)
+```
+
+Create Veteran/Disabled Filter Variables
+```{r}
+vet_disabled_variables <- c(civilian_vets = 'DP02_0070PE',
+                         disabled_18_to_64 = 'DP02_0076PE'
+                         )
+```
+
+Create Years Filter Variables
+```{r}
+years <- lst(2019)
+```
+
+Run Davidson County table for Race variables
+```{r}
+state_diversity <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        variables = race_variables_pecentage,
+        year = .x,
+        survey = 'acs1'
+    ),
+    .id = 'year'
+    ) %>% clean_names()
+
+state_diversity <- state_diversity %>% filter(geoid=='47037')
+```
+
+Create Column for Race Labels
+```{r}
+state_diversity$Label[state_diversity$variable ==  "DP05_0033P"] <- "totpop"
+state_diversity$Label[state_diversity$variable ==  "DP05_0076P"] <- "nothispanic"
+state_diversity$Label[state_diversity$variable ==  "DP05_0037P"] <- "nh_whitealone"
+state_diversity$Label[state_diversity$variable ==  "DP05_0038P"] <- "nh_black"
+state_diversity$Label[state_diversity$variable ==  "DP05_0039P"] <- "nh_indian"
+state_diversity$Label[state_diversity$variable ==  "DP05_0044P"] <- "nh_asian"
+state_diversity$Label[state_diversity$variable ==  "DP05_0052P"] <- "nh_pacisl"
+state_diversity$Label[state_diversity$variable ==  "DP05_0035P"] <- "nh_multi"
+state_diversity$Label[state_diversity$variable ==  "DP05_0071P"] <- "hispanic"
+```
+
+Run Davidson County table for Education variables
+```{r}
+state_education <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        variables = education_variables,
+        year = .x,
+        survey = 'acs1'
+    ),
+    .id = 'year'
+    ) %>% clean_names()
+
+state_education %>% filter(geoid=='47037')
+```
+
+Create Column for Education Labels
+```{r}
+state_education$Label[state_education$variable ==  "DP02_0059"] <- "Pop25andover"
+state_education$Label[state_education$variable ==  "DP02_0060P"] <- "lessthan9th"
+state_education$Label[state_education$variable ==  "DP02_0067P"] <- "highschool"
+state_education$Label[state_education$variable ==  "DP02_0063P"] <- "somecollege"
+state_education$Label[state_education$variable ==  "DP02_0064P"] <- "associates"
+state_education$Label[state_education$variable ==  "DP02_0065P"] <- "bachelors"
+state_education$Label[state_education$variable ==  "DP02_0066P"] <- "graduate"
+
+
+```
+
+
+Run Davidson County table for Age variable
+```{r}
+state_age <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        variables = age_variables,
+        year = .x,
+        survey = 'acs1'
+    ),
+    .id = 'year'
+    )  %>%
+    clean_names()
+
+state_age <- state_age %>% filter(geoid=='47037')
+```
+Create Column for Age Labels
+```{r}
+state_age$Label[state_age$variable == "B01001_001"] <- "SEX_BY_AGE_Total"
+state_age$Label[state_age$variable == "B01001_002"] <- "SEX_BY_AGE_Male_"
+state_age$Label[state_age$variable == "B01001_003"] <- "SEX_BY_AGE_Male_Under_5_years"
+state_age$Label[state_age$variable == "B01001_004"] <- "SEX_BY_AGE_Male_5_to_9_years"
+state_age$Label[state_age$variable == "B01001_005"] <- "SEX_BY_AGE_Male_10_to_14_years"
+state_age$Label[state_age$variable == "B01001_006"] <- "SEX_BY_AGE_Male_15_to_17_years"
+state_age$Label[state_age$variable == "B01001_007"] <- "SEX_BY_AGE_Male_18_and_19_years"
+state_age$Label[state_age$variable == "B01001_008"] <- "SEX_BY_AGE_Male_20_years"
+state_age$Label[state_age$variable == "B01001_009"] <- "SEX_BY_AGE_Male_21_years"
+state_age$Label[state_age$variable == "B01001_010"] <- "SEX_BY_AGE_Male_22_to_24_years"
+state_age$Label[state_age$variable == "B01001_011"] <- "SEX_BY_AGE_Male_25_to_29_years"
+state_age$Label[state_age$variable == "B01001_012"] <- "SEX_BY_AGE_Male_30_to_34_years"
+state_age$Label[state_age$variable == "B01001_013"] <- "SEX_BY_AGE_Male_35_to_39_years"
+state_age$Label[state_age$variable == "B01001_014"] <- "SEX_BY_AGE_Male_40_to_44_years"
+state_age$Label[state_age$variable == "B01001_015"] <- "SEX_BY_AGE_Male_45_to_49_years"
+state_age$Label[state_age$variable == "B01001_016"] <- "SEX_BY_AGE_Male_50_to_54_years"
+state_age$Label[state_age$variable == "B01001_017"] <- "SEX_BY_AGE_Male_55_to_59_years"
+state_age$Label[state_age$variable == "B01001_018"] <- "SEX_BY_AGE_Male_60_and_61_years"
+state_age$Label[state_age$variable == "B01001_019"] <- "SEX_BY_AGE_Male_62_to_64_years"
+state_age$Label[state_age$variable == "B01001_020"] <- "SEX_BY_AGE_Male_65_and_66_years"
+state_age$Label[state_age$variable == "B01001_021"] <- "SEX_BY_AGE_Male_67_to_69_years"
+state_age$Label[state_age$variable == "B01001_022"] <- "SEX_BY_AGE_Male_70_to_74_years"
+state_age$Label[state_age$variable == "B01001_023"] <- "SEX_BY_AGE_Male_75_to_79_years"
+state_age$Label[state_age$variable == "B01001_024"] <- "SEX_BY_AGE_Male_80_to_84_years"
+state_age$Label[state_age$variable == "B01001_025"] <- "SEX_BY_AGE_Male_85_years_and_over"
+state_age$Label[state_age$variable == "B01001_026"] <- "SEX_BY_AGE_Female_"
+state_age$Label[state_age$variable == "B01001_027"] <- "SEX_BY_AGE_Female_Under_5_years"
+state_age$Label[state_age$variable == "B01001_028"] <- "SEX_BY_AGE_Female_5_to_9_years"
+state_age$Label[state_age$variable == "B01001_029"] <- "SEX_BY_AGE_Female_10_to_14_years"
+state_age$Label[state_age$variable == "B01001_030"] <- "SEX_BY_AGE_Female_15_to_17_years"
+state_age$Label[state_age$variable == "B01001_031"] <- "SEX_BY_AGE_Female_18_and_19_years"
+state_age$Label[state_age$variable == "B01001_032"] <- "SEX_BY_AGE_Female_20_years"
+state_age$Label[state_age$variable == "B01001_033"] <- "SEX_BY_AGE_Female_21_years"
+state_age$Label[state_age$variable == "B01001_034"] <- "SEX_BY_AGE_Female_22_to_24_years"
+state_age$Label[state_age$variable == "B01001_035"] <- "SEX_BY_AGE_Female_25_to_29_years"
+state_age$Label[state_age$variable == "B01001_036"] <- "SEX_BY_AGE_Female_30_to_34_years"
+state_age$Label[state_age$variable == "B01001_037"] <- "SEX_BY_AGE_Female_35_to_39_years"
+state_age$Label[state_age$variable == "B01001_038"] <- "SEX_BY_AGE_Female_40_to_44_years"
+state_age$Label[state_age$variable == "B01001_039"] <- "SEX_BY_AGE_Female_45_to_49_years"
+state_age$Label[state_age$variable == "B01001_040"] <- "SEX_BY_AGE_Female_50_to_54_years"
+state_age$Label[state_age$variable == "B01001_041"] <- "SEX_BY_AGE_Female_55_to_59_years"
+state_age$Label[state_age$variable == "B01001_042"] <- "SEX_BY_AGE_Female_60_and_61_years"
+state_age$Label[state_age$variable == "B01001_043"] <- "SEX_BY_AGE_Female_62_to_64_years"
+state_age$Label[state_age$variable == "B01001_044"] <- "SEX_BY_AGE_Female_65_and_66_years"
+state_age$Label[state_age$variable == "B01001_045"] <- "SEX_BY_AGE_Female_67_to_69_years"
+state_age$Label[state_age$variable == "B01001_046"] <- "SEX_BY_AGE_Female_70_to_74_years"
+state_age$Label[state_age$variable == "B01001_047"] <- "SEX_BY_AGE_Female_75_to_79_years"
+state_age$Label[state_age$variable == "B01001_048"] <- "SEX_BY_AGE_Female_80_to_84_years"
+state_age$Label[state_age$variable == "B01001_049"] <- "SEX_BY_AGE_Female_85_years_and_over"
+
+
+```
+
+Run Davidson County table for Veteran/Disabled variables
+```{r}
+state_vet_disabled <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        variables = vet_disabled_variables,
+        year = .x,
+        survey = 'acs1'
+    ),
+    .id = 'year'
+    )  %>%
+    clean_names()
+
+state_vet_disabled <- state_vet_disabled %>% filter(geoid=='47037')
+```
+Create Column for Labels
+```{r}
+state_vet_disabled$Label[state_vet_disabled$variable == "DP02_0070P"] <- "civilian_vets"
+state_vet_disabled$Label[state_vet_disabled$variable == "DP02_0076P"] <- "disabled_18_to_64"
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
