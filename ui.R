@@ -30,18 +30,51 @@ shinyUI(
     # Show a plot of the generated distribution
     dashboardBody(
       fluidRow(
-        column(width = 6,
+        column(width = 4, # Race graphs for cencus
                box(width = NULL, title = 'Bar Chart',
-                   plotOutput("distPlot")
+                   plotOutput("cencusracePlot")
+               )
+        ),
+        column(width = 4, # Race graphs for cencus
+               box(width = NULL, title = 'Bar Chart',
+                   plotOutput("cencusagePlot")
+               )
+        ),
+        column(width = 4, # Race graphs for cencus
+               box(width = NULL, title = 'Bar Chart',
+                   plotOutput("cencuseducationPlot")
                )
         ),
         
-        column(width = 6,
+        column(width = 4,
                box(width = NULL,
-                   plotOutput("Upload")
+                   plotOutput("UploadRace")
+               )
+        ),
+        column(width = 4,
+               box(width = NULL,
+                   plotOutput("UploadAge")
+               )
+        ),
+        column(width = 4,
+               box(width = NULL,
+                   plotOutput("UploadEducation")
                )
         )
-      )
+      ),
+      # fluidRow(
+      #   column(width = 6,
+      #          box(width = NULL, title = 'Bar Chart',
+      #              plotOutput("distPlot")
+      #          )
+      #   ),
+      #   
+      #   column(width = 6,
+      #          box(width = NULL,
+      #              plotOutput("Upload")
+      #          )
+      #   )
+      # )
     )
     
   )
