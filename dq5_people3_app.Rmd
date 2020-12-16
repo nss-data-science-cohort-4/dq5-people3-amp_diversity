@@ -26,7 +26,7 @@ metadata <- listCensusMetadata(
 
 
 ```{r}
-#view(metadata)
+view(metadata)
 ```
 ```{r}
 #listCensusMetadata(type = "variables")
@@ -96,7 +96,7 @@ state_age <- map_dfr(
     clean_names()
 state_age <- state_age %>% filter(geoid=='47037')
 
-#view(metadata)
+view(metadata)
 ```
 
 Aggregate the age groups into decade buckets (e.g., 20-29, 30-39) 
