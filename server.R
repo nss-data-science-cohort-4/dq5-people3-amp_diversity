@@ -8,39 +8,30 @@ shinyServer(function(input, output) {
                                  })
   
   output$cencusracePlot <- renderPlot({
-    # 
-    # penguins %>% 
-    #     filter(island == input$island) %>% 
-    #     drop_na(body_mass_g) %>% 
-    #     ggplot(aes(x = body_mass_g)) +
-    #     geom_histogram(color = 'black', bins = input$bins)
-    cencus %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+    # plot data for distribution of Sex
+    census_data %>%
+      slice(1:14) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Census Gender") +
       geom_bar(stat="identity",fill="red")
     
   })
   output$cencusagePlot <- renderPlot({
-    # 
-    # penguins %>% 
-    #     filter(island == input$island) %>% 
-    #     drop_na(body_mass_g) %>% 
-    #     ggplot(aes(x = body_mass_g)) +
-    #     geom_histogram(color = 'black', bins = input$bins)
-    cencus %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+    # graph for Race on census
+    census_data %>%
+      slice(15:23) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Census Race") +
       geom_bar(stat="identity",fill="red")
     
   })
   
   output$cencuseducationPlot <- renderPlot({
-    # 
-    # penguins %>% 
-    #     filter(island == input$island) %>% 
-    #     drop_na(body_mass_g) %>% 
-    #     ggplot(aes(x = body_mass_g)) +
-    #     geom_histogram(color = 'black', bins = input$bins)
-    cencus %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+    # Graph Education distribution of census
+    census_data %>%
+      slice(24:28) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Cencus Education") +
       geom_bar(stat="identity",fill="red")
     
   })
@@ -50,12 +41,11 @@ shinyServer(function(input, output) {
   output$UploadRace <- renderPlot({
     input$load
     uploaded_data <- isolate(uploaded_data())
-    # penguins %>%
-    #     filter(island == input$island) %>% 
-    #     ggplot(aes(x = sex)) +
-    #     geom_bar() 
+    # graph men and women in uploaded data
     uploaded_data %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+      slice(1:14) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Company Gender") +
       geom_bar(stat="identity",fill="blue")
     
   })
@@ -63,12 +53,11 @@ shinyServer(function(input, output) {
   output$UploadAge <- renderPlot({
     input$load
     uploaded_data <- isolate(uploaded_data())
-    # penguins %>%
-    #     filter(island == input$island) %>% 
-    #     ggplot(aes(x = sex)) +
-    #     geom_bar() 
+    # race data for upload
     uploaded_data %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+      slice(15:23) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Company Race") +
       geom_bar(stat="identity",fill="blue")
     
   })
@@ -76,12 +65,11 @@ shinyServer(function(input, output) {
   output$UploadEducation <- renderPlot({
     input$load
     uploaded_data <- isolate(uploaded_data())
-    # penguins %>%
-    #     filter(island == input$island) %>% 
-    #     ggplot(aes(x = sex)) +
-    #     geom_bar() 
+    # education data
     uploaded_data %>%
-      ggplot(aes(x=Values, y=Percentage)) +
+      slice(24:28) %>%
+      ggplot(aes(x=Percentage, y=Variable)) +
+      ggtitle("Company Education") +
       geom_bar(stat="identity",fill="blue")
     
   })

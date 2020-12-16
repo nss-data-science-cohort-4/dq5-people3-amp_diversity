@@ -6,4 +6,6 @@ library(shinydashboard)
 # 
 # island_choices <- sort(unique(penguins$island))
 
-census_data <- read_csv('testing.csv')
+census_data <- read_csv('upload.csv')
+
+
