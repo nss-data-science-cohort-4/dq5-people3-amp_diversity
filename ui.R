@@ -1,22 +1,14 @@
 library(shinythemes)
 shinyUI(
   dashboardPage(
-    # theme = shinytheme("slate"),
+  
     # Application title
     dashboardHeader(title = "Demographic Data"),
     
-    # Sidebar with a slider input for number of bins
+ 
     
     dashboardSidebar(
-      # sliderInput("bins",
-      #             "Number of bins:",
-      #             min = 1,
-      #             max = 50,
-      #             value = 30),
-      # selectInput("island",
-      #             "Choose an island:",
-      #             choices = island_choices,
-      #             selected = island_choices[1]),
+ 
       fileInput("file",
                 "Choose a file:"
       ),
@@ -32,49 +24,37 @@ shinyUI(
       fluidRow(
         column(width = 4, # Race graphs for cencus
                box(width = NULL, title = 'Bar Chart',
-                   plotOutput("cencusracePlot")
-               )
-        ),
-        column(width = 4, # Race graphs for cencus
-               box(width = NULL, title = 'Bar Chart',
                    plotOutput("cencusagePlot")
                )
         ),
         column(width = 4, # Race graphs for cencus
                box(width = NULL, title = 'Bar Chart',
+                   plotOutput("cencusracePlot")
+               )
+        ),
+        column(width = 4, # education graphs for cencus
+               box(width = NULL, title = 'Bar Chart',
                    plotOutput("cencuseducationPlot")
                )
         ),
-        
-        column(width = 4,
-               box(width = NULL,
-                   plotOutput("UploadRace")
-               )
-        ),
+        # men and women and age
         column(width = 4,
                box(width = NULL,
                    plotOutput("UploadAge")
                )
-        ),
+        ), # race graph
+        column(width = 4,
+               box(width = NULL,
+                   plotOutput("UploadRace")
+               )
+        ),# education to graphs
         column(width = 4,
                box(width = NULL,
                    plotOutput("UploadEducation")
                )
         )
       ),
-      # fluidRow(
-      #   column(width = 6,
-      #          box(width = NULL, title = 'Bar Chart',
-      #              plotOutput("distPlot")
-      #          )
-      #   ),
-      #   
-      #   column(width = 6,
-      #          box(width = NULL,
-      #              plotOutput("Upload")
-      #          )
-      #   )
-      # )
+
     )
     
   )
