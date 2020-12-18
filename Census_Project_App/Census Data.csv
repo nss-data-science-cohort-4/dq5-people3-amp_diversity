@@ -1,0 +1,31 @@
+index,Variable,Percentage
+1,Male - 18 to 19 years,1.609174545
+2,Male - 20 to 29 years,10.65306937
+3,Male - 30 to 39 years,10.50572502
+4,Male - 40 to 49 years,7.8493531
+5,Male - 50 to 59 years,7.02807164
+6,Male - 60 to 66 years,4.414886861
+7,Male - 67 and over,5.475693625
+8,Female - 18 to 19 years,1.608811628
+9,Female - 20 to 29 years,11.9229164
+10,Female - 30 to 39 years,11.41446951
+11,Female - 40 to 49 years,7.204449364
+12,Female - 50 to 59 years,7.618900724
+13,Female - 60 to 66 years,4.942568365
+14,Female - 67 and over,7.751909851
+15,American Indian and Alaska Native,0.3
+16,Black or African American,26.8
+17,Asian,3.8
+18,Native Hawaiian and Other Pacific Islander,0.1
+19,White Alone,63.2
+20,Two or more races,2.4
+21,Hispanic or Latino,10.4
+22,Other Race,3.4
+23,Less than 9th Grade,4.1
+24,High school graduate (includes equivalency),89.5
+25,"Some college, no degree",17.8
+26,Associate's degree,6.3
+27,Bachelor's degree,28.3
+28,Graduate/Professional Degree,17.3
+29,Male - 18 and over,47.5
+30,Female - 18 and over,52.5
