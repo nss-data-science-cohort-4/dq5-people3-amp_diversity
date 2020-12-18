@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "R Notebook"
 output: html_notebook
@@ -7,6 +8,9 @@ output: html_notebook
 library(tidyverse)
 library(censusapi)
 library(dplyr)
+library(tidycensus)
+library(janitor)
+library(purrr)
 
 ```{r}
 #created a text file with the api key, read in
@@ -15,7 +19,7 @@ key=read_lines('data/key.txt')
 ```{r}
 #create dataset for us census apis
 apis <- listCensusApis()
-#view(apis)
+view(apis)
 ```
 ```{r}
 #look into metadata for acs1/2019
@@ -33,6 +37,17 @@ view(metadata)
 ```
 
 Pull in age demographics for 18 and above, then combine into decade buckets, and create a % for each bucket
+
+```{r}
+#Create Years Filter Variables
+
+
+```
+```{r}
+years <- lst(2019)
+```
+
+
 ```{r}
 
 # create an age variable to plug into code, note we can only find estimates and not percentages for age & sex
@@ -205,6 +220,12 @@ acs1_num <- acs1_vars %>%
 data_comb <- bind_rows(acs1_num, age_bracket)
 data_comb
 ```
+Remove the left "number" column so that there is only "Variables" and "Percentage"
+```{r}
+
+```
+
+
 ```{r}
 #convert to test csv file
 write.csv(data_comb,"data/test_file2.csv", row.names = TRUE)
